@@ -12,14 +12,23 @@
 #import "MELDynamicCropView.h"
 #import "ModalViewController.h"
 
-#define imageWidth                                       (400.0f)
+typedef enum : NSUInteger{
+    kCropRight,
+    kCropLeft,
+    kCropPano
+}CurrentCropSelection;
 
 @interface ViewController ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
-@property (nonatomic, strong) MELDynamicCropView      *dynamicCropView;
+@property (nonatomic, strong) MELDynamicCropView      *cropViewLeft;
+@property (nonatomic, strong) MELDynamicCropView      *cropViewRight;
+@property (nonatomic, strong) MELDynamicCropView      *cropViewPano;
 @property (nonatomic, strong) UIImagePickerController *photoRollController;
 @property (nonatomic, strong) UIImage                 *image;
-@property (nonatomic, strong) UILabel                 *photoRollLabel;
+@property (nonatomic, strong) UILabel                 *photoRollLeft;
+@property (nonatomic, strong) UILabel                 *photoRollRight;
+@property (nonatomic, strong) UILabel                 *photoRollPano;
 @property (nonatomic, strong) UILabel                 *croppedPicLabel;
+@property (nonatomic, assign) CurrentCropSelection    currentSelection;
 @end
 
 @implementation ViewController
@@ -31,11 +40,8 @@
 - (void)viewWillLayoutSubviews{
     [super viewWillLayoutSubviews];
     
-    CGRect labelFrame = [[self photoRollLabel] frame];
-    labelFrame.origin.y    = 20.0f;
-    labelFrame.size.height = 60.0f;
-    labelFrame.size.width  = CGRectGetWidth([[self view] frame]);
-    [[self photoRollLabel] setFrame:labelFrame];
+    CGRect labelFrame = [[self photoRollLeft] frame];
+    [[self photoRollLeft] setFrame:labelFrame];
     
     CGRect showLabelFrame = [[self croppedPicLabel] frame];
     showLabelFrame.size.height = 60.0f;
@@ -45,21 +51,60 @@
     
 }
 
-- (CGRect)viewFrame{
+- (CGRect)cropViewLeftFrame{
     CGRect frame = CGRectZero;
-    frame.size      = CGSizeMake(imageWidth, imageWidth);
-    frame.origin.y  = (CGRectGetHeight([[self view] frame]) - frame.size.height)/2;
-    frame.origin.x  = (CGRectGetWidth([[self view] frame]) - frame.size.width)/2;
+    CGFloat oneFourth = CGRectGetWidth([[self view]frame])/4;
+    frame.size        = CGSizeMake(oneFourth, oneFourth);
+    frame.origin.y    = CGRectGetMaxY([[self photoRollLeft]frame]);
+    frame.origin.x    = frame.origin.y;
     return frame;
 }
 
-- (CGRect)cropFrame{
-    CGRect frame = CGRectZero;
-    frame.size      = CGSizeMake(200, 200);
-    frame.origin.y  = (CGRectGetHeight([self viewFrame]) - frame.size.height)/2;
-    frame.origin.x  = (CGRectGetWidth([self viewFrame]) - frame.size.width)/2;
+- (CGRect)cropViewLeftCropperFrame{
+    CGRect frame      = CGRectZero;
+    CGFloat oneHalf   = CGRectGetWidth([self cropViewLeftFrame])/2;
+    frame.size        = CGSizeMake(oneHalf, oneHalf);
+    frame.origin.y    = (CGRectGetHeight([self cropViewLeftFrame]) - frame.size.height)/2;
+    frame.origin.x    = (CGRectGetWidth([self cropViewLeftFrame]) - frame.size.width)/2;
     return frame;
 }
+
+- (CGRect)cropViewRightFrame{
+    CGRect frame = CGRectZero;
+    CGFloat oneFifth  = CGRectGetWidth([[self view]frame])/5;
+    frame.size        = CGSizeMake(oneFifth, oneFifth);
+    frame.origin.y    = CGRectGetMaxY([[self photoRollLeft]frame]);
+    frame.origin.x    = CGRectGetWidth([[self view]frame]) - frame.origin.y;
+    return frame;
+}
+
+- (CGRect)cropViewRightCropperFrame{
+    CGRect frame = CGRectZero;
+    CGFloat twoThirds = CGRectGetWidth([self cropViewRightFrame]) * 0.66f;
+    frame.size        = CGSizeMake(twoThirds, twoThirds);
+    frame.origin.y    = (CGRectGetHeight([self cropViewRightFrame]) - frame.size.height)/2;
+    frame.origin.x    = (CGRectGetWidth([self cropViewRightFrame]) - frame.size.width)/2;
+    return frame;
+}
+
+- (CGRect)cropViewPanoFrame{
+    CGRect frame = CGRectZero;
+    frame.size.width  = CGRectGetWidth([[self view]frame])/3;
+    frame.size.height = CGRectGetHeight([[self view]frame])/5;
+    frame.origin.y    = CGRectGetHeight([[self view]frame]) - CGRectGetHeight([[self croppedPicLabel]frame]);
+    frame.origin.x    = (CGRectGetWidth([[self view]frame]) - frame.size.width)/2;
+    return frame;
+}
+
+- (CGRect)cropViewPanoCropperFrame{
+    CGRect frame = CGRectZero;
+    CGFloat twoThirds = CGRectGetWidth([self cropViewLeftFrame]) * 0.66f;
+    frame.size        = CGSizeMake(twoThirds, twoThirds);
+    frame.origin.y    = CGRectGetHeight([self cropViewPanoFrame]) * 0.75f;
+    frame.origin.x    = CGRectGetWidth([self cropViewPanoFrame]) * 0.75f;
+    return frame;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -68,18 +113,19 @@
 
 #pragma mark - getters
 
-- (UILabel *)photoRollLabel{
-    if (!_photoRollLabel){
-        _photoRollLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        [_photoRollLabel setText:@"Photo Roll"];
-        [_photoRollLabel setTextAlignment:NSTextAlignmentCenter];
-        [_photoRollLabel setUserInteractionEnabled:YES];
-        [[_photoRollLabel layer] setZPosition:3.0f];
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTap:)];
-        [_photoRollLabel addGestureRecognizer:tap];
-        [[self view] addSubview:_photoRollLabel];
+- (UILabel *)photoRollLeft{
+    if (!_photoRollLeft){
+        _photoRollLeft = [[UILabel alloc] initWithFrame:CGRectZero];
+        [_photoRollLeft setText:@"Photo Roll"];
+        [_photoRollLeft sizeToFit];
+        [_photoRollLeft setTextAlignment:NSTextAlignmentCenter];
+        [_photoRollLeft setUserInteractionEnabled:YES];
+        [[_photoRollLeft layer] setZPosition:3.0f];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapLeft:)];
+        [_photoRollLeft addGestureRecognizer:tap];
+        [[self view] addSubview:_photoRollLeft];
     }
-    return _photoRollLabel;
+    return _photoRollLeft;
 }
 
 - (UILabel *)croppedPicLabel{
@@ -111,14 +157,34 @@
 }
 
 
-- (MELDynamicCropView *)dynamicCropView{
-    if (!_dynamicCropView){
-        _dynamicCropView = [[MELDynamicCropView alloc]initWithFrame:[self viewFrame] cropFrame:[self cropFrame]];
-        [_dynamicCropView setBackgroundColor:[UIColor redColor]];
-        [_dynamicCropView setCropColor:[UIColor greenColor]];
-        [_dynamicCropView setCropAlpha:0.5f];
+- (MELDynamicCropView *)cropViewLeft{
+    if (!_cropViewLeft){
+        _cropViewLeft = [[MELDynamicCropView alloc]initWithFrame:[self cropViewLeftFrame] cropFrame:[self cropViewLeftCropperFrame]];
+        //[_cropViewLeft setBackgroundColor:[UIColor redColor]];
+        [_cropViewLeft setCropColor:[UIColor greenColor]];
+        [_cropViewLeft setCropAlpha:0.4f];
     }
-    return _dynamicCropView;
+    return _cropViewLeft;
+}
+
+- (MELDynamicCropView *)cropViewRight{
+    if (!_cropViewRight){
+        _cropViewRight = [[MELDynamicCropView alloc]initWithFrame:[self cropViewRightFrame] cropFrame:[self cropViewRightCropperFrame]];
+        //[_cropViewRight setBackgroundColor:[UIColor clearColor]];
+        [_cropViewRight setCropColor:[UIColor blueColor]];
+        [_cropViewRight setCropAlpha:0.4f];
+    }
+    return _cropViewRight;
+}
+
+- (MELDynamicCropView *)cropViewPano{
+    if (!_cropViewPano){
+        _cropViewPano = [[MELDynamicCropView alloc]initWithFrame:[self cropViewPanoFrame] cropFrame:[self cropViewPanoCropperFrame]];
+        //[_cropViewRight setBackgroundColor:[UIColor clearColor]];
+        [_cropViewPano setCropColor:[UIColor yellowColor]];
+        [_cropViewPano setCropAlpha:0.4f];
+    }
+    return _cropViewPano;
 }
 
 #pragma mark - UIImagePickerControllerDelegate
@@ -132,8 +198,8 @@
         
         if (savedImage){
             _image = savedImage;
-            [[self dynamicCropView] setImage:_image];
-            [[self view] addSubview:[self dynamicCropView]];
+            [[self cropViewLeft] setImage:_image];
+            [[self view] addSubview:[self cropViewLeft]];
         }
     }];
 }
@@ -141,7 +207,22 @@
 
 #pragma mark - selectors
 
-- (void)didTap:(id)sender{
+- (void)didTapLeft:(id)sender{
+    _currentSelection = kCropLeft;
+    [self presentPhotoRoll];
+}
+
+- (void)didTapRight:(id)sender{
+    _currentSelection = kCropRight;
+    [self presentPhotoRoll];
+}
+
+- (void)didTapPano:(id)sender{
+    _currentSelection = kCropPano;
+    [self presentPhotoRoll];
+}
+
+- (void)presentPhotoRoll{
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:[self photoRollController] animated:YES completion:nil];
     });
@@ -150,8 +231,8 @@
 - (void)didTapCrop:(id)sender{
     ModalViewController *vc = [[ModalViewController alloc] init];
     [[vc view] setBackgroundColor:[UIColor whiteColor]];
-    [vc setImage:[[self dynamicCropView] croppedImage]];
-    [vc setImageSize:[[self dynamicCropView] cropFrame].size];
+    [vc setImage:[[self cropViewLeft] croppedImage]];
+    [vc setImageSize:[[self cropViewLeft] cropFrame].size];
     [self presentViewController:vc animated:YES completion:nil];
 }
 

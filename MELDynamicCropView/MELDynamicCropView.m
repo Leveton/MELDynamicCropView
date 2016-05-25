@@ -68,6 +68,7 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForWidthWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
+    
     CGFloat cropProportion = cropSize.height/cropSize.width;
     CGFloat adjustedWidth      = frame.size.width;
     CGFloat adjustedHeight     = adjustedWidth * cropProportion;
@@ -81,6 +82,7 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForHeightWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
+    
     CGFloat cropProportion = cropSize.width/cropSize.height;
     CGFloat adjustedHeight     = frame.size.height;
     CGFloat adjustedWidth      = adjustedHeight * cropProportion;
@@ -233,6 +235,19 @@ typedef enum : NSUInteger{
         proportion             = image.size.height/image.size.width;
         newWidth               = (_cropSize.width + self.frame.size.width)/2;
         newHeight              = newWidth * proportion;
+    }
+    
+    /* if crop size is wider or taller than the image, just make the proportional to the longer side of the view's frame */
+    if (_cropSize.height > newHeight){
+        newHeight              = self.frame.size.height;
+        proportion             = image.size.width/image.size.height;
+        newWidth               = newHeight * proportion;
+    }
+    
+    if (_cropSize.width > newWidth){
+        newWidth              = self.frame.size.width;
+        proportion            = image.size.height/image.size.width;
+        newHeight             = newWidth * proportion;
     }
     
     CGRect  dynamicImageViewFrame = [[self imageToCrop] frame];

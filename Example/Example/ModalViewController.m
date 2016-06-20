@@ -29,8 +29,6 @@
     imageFrame.size = _imageSize;
     [[self imageView] setFrame:imageFrame];
     
-    NSLog(@"image frame x,y,width,height: %f %f %f %f", imageFrame.origin.x, imageFrame.origin.y, imageFrame.size.width, imageFrame.size.height);
-    
     CGRect buttonFrame = [[self button] frame];
     buttonFrame.size.width = 100;
     buttonFrame.size.height = 100.0f;

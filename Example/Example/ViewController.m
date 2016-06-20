@@ -12,6 +12,7 @@
 #import "MELDynamicCropView.h"
 #import "ModalViewController.h"
 
+#define kStatusHeight (20.0f)
 typedef enum : NSUInteger{
     kCropRight,
     kCropLeft,
@@ -31,6 +32,7 @@ typedef enum : NSUInteger{
 @property (nonatomic, strong) UILabel                 *rightCropLabel;
 @property (nonatomic, strong) UILabel                 *panoCropLabel;
 @property (nonatomic, assign) CurrentCropSelection    currentSelection;
+@property (nonatomic, assign) BOOL                    lifted;
 @end
 
 @implementation ViewController
@@ -39,18 +41,36 @@ typedef enum : NSUInteger{
     [super viewDidLoad];
 }
 
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    
+    if (!_lifted){
+        _lifted = YES;
+        [[self cropViewLeft] setImage:[UIImage imageNamed:@"books"]];
+        [[self view] addSubview:[self cropViewLeft]];
+        [[self cropViewRight] setImage:[UIImage imageNamed:@"mike"]];
+        [[self view] addSubview:[self cropViewRight]];
+        [[self cropViewPano] setImage:[UIImage imageNamed:@"pano"]];
+        [[self view] addSubview:[self cropViewPano]];
+
+    }
+}
+
 - (void)viewWillLayoutSubviews{
     [super viewWillLayoutSubviews];
     
-    CGRect photoLeftFrame = [[self photoRollLeft] frame];
+    CGRect photoLeftFrame   = [[self photoRollLeft] frame];
+    photoLeftFrame.origin.y = kStatusHeight;
     [[self photoRollLeft] setFrame:photoLeftFrame];
     
     CGRect photoRightFrame = [[self photoRollRight] frame];
     photoRightFrame.origin.x    = CGRectGetWidth([[self view]frame]) - photoRightFrame.size.width;
+    photoRightFrame.origin.y    = kStatusHeight;
     [[self photoRollRight] setFrame:photoRightFrame];
     
     CGRect photoPanoFrame = [[self photoRollPano] frame];
     photoPanoFrame.origin.x    = (CGRectGetWidth([[self view]frame]) - photoPanoFrame.size.width)/2;
+    photoPanoFrame.origin.y    = kStatusHeight;
     [[self photoRollPano] setFrame:photoPanoFrame];
     
     CGRect leftCropFrame = [[self leftCropLabel] frame];
@@ -82,7 +102,7 @@ typedef enum : NSUInteger{
     CGRect frame      = CGRectZero;
     CGFloat oneHalf   = CGRectGetWidth([self cropViewLeftFrame])/2;
     frame.size        = CGSizeMake(oneHalf, oneHalf);
-    frame.origin.y    = (CGRectGetHeight([self cropViewLeftFrame]) - frame.size.height)/2;
+    //frame.origin.y    = (CGRectGetHeight([self cropViewLeftFrame]) - frame.size.height)/2;
     frame.origin.x    = (CGRectGetWidth([self cropViewLeftFrame]) - frame.size.width)/2;
     return frame;
 }
@@ -107,8 +127,8 @@ typedef enum : NSUInteger{
 
 - (CGRect)cropViewPanoFrame{
     CGRect frame = CGRectZero;
-    frame.size.width  = CGRectGetWidth([[self view]frame])/3;
-    frame.size.height = CGRectGetHeight([[self view]frame])/5;
+    frame.size.width  = CGRectGetWidth([[self view]frame])/2;
+    frame.size.height = CGRectGetHeight([[self view]frame])/4;
     frame.origin.y    = CGRectGetHeight([[self view]frame]) - ((CGRectGetHeight([[self panoCropLabel]frame])+frame.size.height));
     frame.origin.x    = (CGRectGetWidth([[self view]frame]) - frame.size.width)/2;
     return frame;
@@ -246,8 +266,8 @@ typedef enum : NSUInteger{
 - (MELDynamicCropView *)cropViewLeft{
     if (!_cropViewLeft){
         _cropViewLeft = [[MELDynamicCropView alloc]initWithFrame:[self cropViewLeftFrame] cropFrame:[self cropViewLeftCropperFrame]];
-        //[_cropViewLeft setBackgroundColor:[UIColor redColor]];
-        [_cropViewLeft setCropColor:[UIColor greenColor]];
+        //[_cropViewRight setBackgroundColor:[UIColor clearColor]];
+        [_cropViewLeft setCropColor:[UIColor colorWithRed:80.0f/255.0f green:227.0f/255.0f blue:121.0f/255.0f alpha:1.0]];
         [_cropViewLeft setCropAlpha:0.4f];
     }
     return _cropViewLeft;
@@ -257,7 +277,7 @@ typedef enum : NSUInteger{
     if (!_cropViewRight){
         _cropViewRight = [[MELDynamicCropView alloc]initWithFrame:[self cropViewRightFrame] cropFrame:[self cropViewRightCropperFrame]];
         //[_cropViewRight setBackgroundColor:[UIColor clearColor]];
-        [_cropViewRight setCropColor:[UIColor blueColor]];
+        [_cropViewRight setCropColor:[UIColor colorWithRed:74.0f/255.0f green:144.0f/255.0f blue:226.0f/255.0f alpha:1.0]];
         [_cropViewRight setCropAlpha:0.4f];
     }
     return _cropViewRight;
@@ -266,8 +286,8 @@ typedef enum : NSUInteger{
 - (MELDynamicCropView *)cropViewPano{
     if (!_cropViewPano){
         _cropViewPano = [[MELDynamicCropView alloc]initWithFrame:[self cropViewPanoFrame] cropFrame:[self cropViewPanoCropperFrame]];
-        [_cropViewPano setBackgroundColor:[UIColor redColor]];
-        [_cropViewPano setCropColor:[UIColor yellowColor]];
+        //[_cropViewPano setBackgroundColor:[UIColor redColor]];
+        [_cropViewPano setCropColor:[UIColor colorWithRed:80.0f/255.0f green:227.0f/255.0f blue:194.0f/255.0f alpha:1.0]];
         [_cropViewPano setCropAlpha:0.4f];
     }
     return _cropViewPano;

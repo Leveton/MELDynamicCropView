@@ -68,7 +68,6 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForWidthWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
-    
     CGFloat cropProportion = cropSize.height/cropSize.width;
     CGFloat adjustedWidth      = frame.size.width;
     CGFloat adjustedHeight     = adjustedWidth * cropProportion;
@@ -82,7 +81,6 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForHeightWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
-    
     CGFloat cropProportion = cropSize.width/cropSize.height;
     CGFloat adjustedHeight     = frame.size.height;
     CGFloat adjustedWidth      = adjustedHeight * cropProportion;
@@ -415,10 +413,21 @@ typedef enum : NSUInteger{
     CGRect cropRect = CGRectApplyAffineTransform(rect, CGAffineTransformMakeScale(scale, scale));
     
     CGImageRef croppedImage = CGImageCreateWithImageInRect(image.CGImage, cropRect);
+    //image = [self removeRotationForImage:image];
     UIImage *newImage = [UIImage imageWithCGImage:croppedImage scale:image.scale orientation:image.imageOrientation];
     CGImageRelease(croppedImage);
     
     return newImage;
+}
+
+- (UIImage *)removeRotationForImage:(UIImage *)image {
+    if (image.imageOrientation == UIImageOrientationUp) return image;
+    
+    UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
+    [image drawInRect:(CGRect){0, 0, image.size}];
+    UIImage *normalizedImage =  UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return normalizedImage;
 }
 
 @end

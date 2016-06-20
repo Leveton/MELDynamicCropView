@@ -311,6 +311,7 @@
 				1C0960A01CF269B00020383F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

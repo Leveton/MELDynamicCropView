@@ -20,6 +20,7 @@ typedef enum : NSUInteger{
 }CurrentCropSelection;
 
 @interface ViewController ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+
 @property (nonatomic, strong) MELDynamicCropView      *cropViewLeft;
 @property (nonatomic, strong) MELDynamicCropView      *cropViewRight;
 @property (nonatomic, strong) MELDynamicCropView      *cropViewPano;
@@ -94,7 +95,6 @@ typedef enum : NSUInteger{
     CGFloat oneFourth = CGRectGetWidth([[self view]frame])/4;
     frame.size        = CGSizeMake(oneFourth, oneFourth);
     frame.origin.y    = CGRectGetMaxY([[self photoRollLeft]frame]);
-    frame.origin.x    = frame.origin.y;
     return frame;
 }
 
@@ -102,7 +102,6 @@ typedef enum : NSUInteger{
     CGRect frame      = CGRectZero;
     CGFloat oneHalf   = CGRectGetWidth([self cropViewLeftFrame])/2;
     frame.size        = CGSizeMake(oneHalf, oneHalf);
-    //frame.origin.y    = (CGRectGetHeight([self cropViewLeftFrame]) - frame.size.height)/2;
     frame.origin.x    = (CGRectGetWidth([self cropViewLeftFrame]) - frame.size.width)/2;
     return frame;
 }
@@ -111,8 +110,8 @@ typedef enum : NSUInteger{
     CGRect frame = CGRectZero;
     CGFloat oneFifth  = CGRectGetWidth([[self view]frame])/5;
     frame.size        = CGSizeMake(oneFifth, oneFifth);
-    frame.origin.y    = CGRectGetMaxY([[self photoRollLeft]frame]);
     frame.origin.x    = CGRectGetWidth([[self view]frame]) - (frame.origin.y + frame.size.width);
+    frame.origin.y    = CGRectGetMaxY([[self photoRollLeft]frame]);
     return frame;
 }
 
@@ -120,8 +119,8 @@ typedef enum : NSUInteger{
     CGRect frame = CGRectZero;
     CGFloat twoThirds = CGRectGetWidth([self cropViewRightFrame]) * 0.66f;
     frame.size        = CGSizeMake(twoThirds, twoThirds);
-    frame.origin.y    = (CGRectGetHeight([self cropViewRightFrame]) - frame.size.height)/2;
     frame.origin.x    = (CGRectGetWidth([self cropViewRightFrame]) - frame.size.width)/2;
+    frame.origin.y    = (CGRectGetHeight([self cropViewRightFrame]) - frame.size.height)/2;
     return frame;
 }
 
@@ -129,17 +128,17 @@ typedef enum : NSUInteger{
     CGRect frame = CGRectZero;
     frame.size.width  = CGRectGetWidth([[self view]frame])/2;
     frame.size.height = CGRectGetHeight([[self view]frame])/4;
-    frame.origin.y    = CGRectGetHeight([[self view]frame]) - ((CGRectGetHeight([[self panoCropLabel]frame])+frame.size.height));
     frame.origin.x    = (CGRectGetWidth([[self view]frame]) - frame.size.width)/2;
+    frame.origin.y    = CGRectGetHeight([[self view]frame]) - ((CGRectGetHeight([[self panoCropLabel]frame])+frame.size.height));
     return frame;
 }
 
 - (CGRect)cropViewPanoCropperFrame{
     CGRect frame = CGRectZero;
-    frame.size.width        = CGRectGetWidth([self cropViewPanoFrame]) * 0.66f;
-    frame.size.height        = CGRectGetHeight([self cropViewPanoFrame]) * 0.66f;
-    frame.origin.y    = (CGRectGetHeight([self cropViewPanoFrame]) - frame.size.height)/2;
+    frame.size.width  = CGRectGetWidth([self cropViewPanoFrame]) * 0.66f;
+    frame.size.height = CGRectGetHeight([self cropViewPanoFrame]) * 0.66f;
     frame.origin.x    = (CGRectGetWidth([self cropViewPanoFrame]) - frame.size.width)/2;
+    frame.origin.y    = (CGRectGetHeight([self cropViewPanoFrame]) - frame.size.height)/2;
     return frame;
 }
 
@@ -158,7 +157,7 @@ typedef enum : NSUInteger{
 - (UILabel *)photoRollLeft{
     if (!_photoRollLeft){
         _photoRollLeft = [[UILabel alloc] initWithFrame:CGRectZero];
-        [_photoRollLeft setText:@"Photo Roll Left"];
+        [_photoRollLeft setText:@"left roll"];
         [_photoRollLeft sizeToFit];
         [_photoRollLeft setTextAlignment:NSTextAlignmentCenter];
         [_photoRollLeft setUserInteractionEnabled:YES];
@@ -173,7 +172,7 @@ typedef enum : NSUInteger{
 - (UILabel *)photoRollRight{
     if (!_photoRollRight){
         _photoRollRight = [[UILabel alloc] initWithFrame:CGRectZero];
-        [_photoRollRight setText:@"Photo Roll Right"];
+        [_photoRollRight setText:@"right roll"];
         [_photoRollRight sizeToFit];
         [_photoRollRight setTextAlignment:NSTextAlignmentCenter];
         [_photoRollRight setUserInteractionEnabled:YES];
@@ -188,7 +187,7 @@ typedef enum : NSUInteger{
 - (UILabel *)photoRollPano{
     if (!_photoRollPano){
         _photoRollPano = [[UILabel alloc] initWithFrame:CGRectZero];
-        [_photoRollPano setText:@"Photo Roll Pano"];
+        [_photoRollPano setText:@"pano roll"];
         [_photoRollPano sizeToFit];
         [_photoRollPano setTextAlignment:NSTextAlignmentCenter];
         [_photoRollPano setUserInteractionEnabled:YES];
@@ -363,6 +362,10 @@ typedef enum : NSUInteger{
     [vc setImage:[[self cropViewRight] croppedImage]];
     [vc setImageSize:[[self cropViewRight] cropFrame].size];
     [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (UIImageView *)anImageView{
+    return [UIImageView new];
 }
 
 - (void)didTapPanoCrop:(id)sender{

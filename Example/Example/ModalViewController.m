@@ -23,14 +23,14 @@
 - (void)viewWillLayoutSubviews{
     [super viewWillLayoutSubviews];
     
-    CGRect imageFrame = [[self imageView] frame];
-    imageFrame.origin.x = (CGRectGetWidth([[self view]frame]) - imageFrame.size.width)/2;
-    imageFrame.origin.y = (CGRectGetHeight([[self view]frame]) - imageFrame.size.height)/2;
+    CGRect imageFrame       = [[self imageView] frame];
+    imageFrame.origin.x     = (CGRectGetWidth([[self view]frame]) - imageFrame.size.width)/2;
+    imageFrame.origin.y     = (CGRectGetHeight([[self view]frame]) - imageFrame.size.height)/2;
     imageFrame.size = _imageSize;
     [[self imageView] setFrame:imageFrame];
     
-    CGRect buttonFrame = [[self button] frame];
-    buttonFrame.size.width = 100;
+    CGRect buttonFrame      = [[self button] frame];
+    buttonFrame.size.width  = 100;
     buttonFrame.size.height = 100.0f;
     [[self button] setFrame:buttonFrame];
 }
@@ -43,7 +43,6 @@
 - (void)setImage:(UIImage *)image{
     _image = image;
     [[self imageView] setImage:_image];
-    //[[self imageView] sizeToFit];
 }
 
 - (void)setImageSize:(CGSize)imageSize{

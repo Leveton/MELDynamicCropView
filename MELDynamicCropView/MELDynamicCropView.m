@@ -68,12 +68,12 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForWidthWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
-    CGFloat cropProportion = cropSize.height/cropSize.width;
+    CGFloat cropProportion     = cropSize.height/cropSize.width;
     CGFloat adjustedWidth      = frame.size.width;
     CGFloat adjustedHeight     = adjustedWidth * cropProportion;
-    CGFloat frameProportion = frame.size.height/frame.size.width;
-    frame.size.width      = cropSize.width;
-    frame.size.height     = frame.size.width * frameProportion;
+    CGFloat frameProportion    = frame.size.height/frame.size.width;
+    frame.size.width           = cropSize.width;
+    frame.size.height          = frame.size.width * frameProportion;
     cropSize = CGSizeMake(adjustedWidth, adjustedHeight);
     
     [self setFrame:frame];
@@ -81,12 +81,12 @@ typedef enum : NSUInteger{
 }
 
 - (void)setUpGeometryForHeightWithFrame:(CGRect)frame cropSize:(CGSize)cropSize{
-    CGFloat cropProportion = cropSize.width/cropSize.height;
+    CGFloat cropProportion     = cropSize.width/cropSize.height;
     CGFloat adjustedHeight     = frame.size.height;
     CGFloat adjustedWidth      = adjustedHeight * cropProportion;
-    CGFloat frameProportion = frame.size.width/frame.size.height;
-    frame.size.height    = cropSize.height;
-    frame.size.width     = frame.size.height * frameProportion;
+    CGFloat frameProportion    = frame.size.width/frame.size.height;
+    frame.size.height          = cropSize.height;
+    frame.size.width           = frame.size.height * frameProportion;
     cropSize = CGSizeMake(adjustedWidth, adjustedHeight);
     
     [self setFrame:frame];
@@ -143,8 +143,8 @@ typedef enum : NSUInteger{
 
 - (CGPoint)orientationCenteredWithSize:(CGSize)size{
     CGPoint point = CGPointZero;
-    point.x    = _cropViewXOffset -  (size.width - _cropView.bounds.size.width)/2;
-    point.y    = _cropViewYOffset -  (size.height - _cropView.bounds.size.height)/2;
+    point.x       = _cropViewXOffset -  (size.width - _cropView.bounds.size.width)/2;
+    point.y       = _cropViewYOffset -  (size.height - _cropView.bounds.size.height)/2;
     return point;
 }
 

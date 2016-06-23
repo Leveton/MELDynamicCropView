@@ -1,4 +1,48 @@
+# MELDynamicCropView 
+
+
 ![](https://raw.githubusercontent.com/Leveton/MELDynamicCropView/master/cropDemo.gif)
+
+
+MELDynamicCropView is an open-source UIView subclass that allows users to interact with multiple photo croppers (or just one cropper). Its image and cropper frames are flexible and support any size. Pinching and panning are built in and the library's simplicity makes it a good foundation to build a more robust photo editor e.g. as seen in the Photos app.
+
+## System Requirements
+iOS 7.0 or above
+
+## Installation
+
+Download this project from GitHub, move the folder named 'MELDynamicCropView' into your XCode project.
+
+## Usage
+
+Import the class header.
+
+``` objective-c
+#import "MELDynamicCropView.h"
+```
+
+Create the view passing in your desired image frame and cropper frame. You can set the image, the cropper color, and the cropper alpha to make it semi-transparent. Don't forget to add it as a subview.
+
+``` objective-c
+- (MELDynamicCropView *)cropView{
+    if (!_cropView){
+        _cropView = [[MELDynamicCropView alloc]initWithFrame:[self yourImageFrame] cropFrame:[self yourCropperFrame]];
+        [_cropView setImage:yourImage];
+        [_cropView setCropColor:[UIColor redColor]];
+        [_cropView setCropAlpha:0.4f];
+        [[self view] addSubview:_cropView];
+    }
+    return _cropView;
+}
+```
+
+Crop the image by simply grabbing the view's croppedImage.
+
+``` objective-c
+- (void)yourCropperMethod{
+    [[self yourImageView] setImage:[[self cropView] croppedImage]];
+}
+```
 
 ## License
 

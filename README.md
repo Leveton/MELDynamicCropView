@@ -1,6 +1,8 @@
 # MELDynamicCropView 
 
-<img src="https://raw.githubusercontent.com/Leveton/MELDynamicCropView/master/screenshot.png" alt="screenshot" width="320px" style="width: 320px;" />
+
+![](https://raw.githubusercontent.com/Leveton/MELDynamicCropView/master/cropDemo.gif)
+
 
 MELDynamicCropView is an open-source UIView subclass that allows users to interact with multiple photo croppers (or just one cropper). Its image and cropper frames are flexible and support any size. Pinching, panning, and support for panorama photos is built in and the library's simplicity makes it a good foundation to build a more robust photo editor e.g. as seen in the Photos app.
 

@@ -1,8 +1,6 @@
 # MELDynamicCropView 
 
-
-![](https://raw.githubusercontent.com/Leveton/MELDynamicCropView/master/cropDemo.gif)
-
+![MELDynamicCropView Screenshot](https://raw.githubusercontent.com/Leveton/MELDynamicCropView/master/screenshot.png)
 
 MELDynamicCropView is an open-source UIView subclass that allows users to interact with multiple photo croppers (or just one cropper). Its image and cropper frames are flexible and support any size. Pinching and panning are built in and the library's simplicity makes it a good foundation to build a more robust photo editor e.g. as seen in the Photos app.
 
@@ -27,7 +25,7 @@ Create the view passing in your desired image frame and cropper frame. You can s
 - (MELDynamicCropView *)cropView{
     if (!_cropView){
         _cropView = [[MELDynamicCropView alloc]initWithFrame:[self yourImageFrame] cropFrame:[self yourCropperFrame]];
-        [_cropView setImage:yourImage];
+        [_cropView setImage:_yourImage];
         [_cropView setCropColor:[UIColor redColor]];
         [_cropView setCropAlpha:0.4f];
         [[self view] addSubview:_cropView];

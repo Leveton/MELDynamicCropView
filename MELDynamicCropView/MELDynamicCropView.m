@@ -392,42 +392,35 @@ typedef enum : NSUInteger{
 #pragma mark - image methods
 
 - (UIImage *)croppedImage{
-    
     return [self croppedImageWithImage:_image rect:[self currentCropRect]];
 }
 
 - (CGRect)currentCropRect{
-    /* this takes _cropView and puts it in _imageToCrop's coordinate space without moving it */
+    /* this takes _cropView, makes a copy of it, and puts the copy in _imageToCrop's coordinate space */
     CGRect cropRect = [_cropView convertRect:_cropView.bounds toView:_imageToCrop];
-    CGFloat ratio   = 1.0f;
     
-    /*changes the rect you give it to another rect with the aspect ratio that you want */
-    ratio           = CGRectGetWidth(AVMakeRectWithAspectRatioInsideRect(_image.size, _imageToCrop.bounds)) / _image.size.width;
+    /*AVMakeRectWithAspectRatioInsideRect changes the rect you give it to another rect with the aspect ratio that you want */
+    CGFloat ratio   = CGRectGetWidth(AVMakeRectWithAspectRatioInsideRect(_image.size, _imageToCrop.bounds)) / _image.size.width;
+    
     CGRect rect     = CGRectMake(cropRect.origin.x/ratio, cropRect.origin.y/ratio, cropRect.size.width/ratio, cropRect.size.height/ratio);
     return rect;
 }
 
 - (UIImage *)croppedImageWithImage:(UIImage *)image rect:(CGRect)rect{
     
-    CGFloat scale   = image.scale;
-    CGRect cropRect = CGRectApplyAffineTransform(rect, CGAffineTransformMakeScale(scale, scale));
+    CGFloat scale       = image.scale;
+    
+    /* To construct a new scaling matrix from x and y values that specify how much to stretch or shrink coordinates. */
+    CGAffineTransform t = CGAffineTransformMakeScale(scale, scale);
+    
+    /* CGRectApplyAffineTransform returns the smallest rectangle that contains the transformed corner points of the rectangle passed to it */
+    CGRect cropRect     = CGRectApplyAffineTransform(rect, t);
     
     CGImageRef croppedImage = CGImageCreateWithImageInRect(image.CGImage, cropRect);
-    //image = [self removeRotationForImage:image];
-    UIImage *newImage = [UIImage imageWithCGImage:croppedImage scale:image.scale orientation:image.imageOrientation];
+    UIImage *newImage       = [UIImage imageWithCGImage:croppedImage scale:image.scale orientation:image.imageOrientation];
     CGImageRelease(croppedImage);
     
     return newImage;
-}
-
-- (UIImage *)removeRotationForImage:(UIImage *)image {
-    if (image.imageOrientation == UIImageOrientationUp) return image;
-    
-    UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
-    [image drawInRect:(CGRect){0, 0, image.size}];
-    UIImage *normalizedImage =  UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return normalizedImage;
 }
 
 @end

@@ -192,6 +192,8 @@ typedef enum : NSUInteger{
 
 - (void)setImage:(UIImage *)image{
     _image = image;
+    
+    /* you need the original image and the original transform in case the pinch gesture is out of bounds */
     _copiedImage = [_image copy];
     
     [[self imageToCrop] setFrame:[self frameForGestureViewWithImage:_image]];
@@ -291,8 +293,10 @@ typedef enum : NSUInteger{
         CGFloat originY = pan.view.frame.origin.y;
         
         if (originX < _cropViewXOffset && originY < _cropViewYOffset && originX > _minimumImageXOffset && originY > _minimumImageYOffset){
+            /* translation is ok, so execute it */
             [pan setTranslation:CGPointMake(0, 0) inView:pan.view.superview];
         }else{
+            /* translation is out of bounds, so prevent and movement */
             [[pan view] setFrame:imageFrame];
             [pan setTranslation:CGPointMake(0, 0) inView:pan.view.superview];
         }
@@ -318,13 +322,14 @@ typedef enum : NSUInteger{
         CGFloat gestureMaxY    = gestureOriginY + recognizer.view.frame.size.height;
         CGFloat cropperMaxX    = _cropViewXOffset + _cropSize.width;
         CGFloat cropperMaxY    = _cropViewYOffset + _cropSize.height;
-        //bool outOfBounds       = NO;
         
+        /* the recognizer's size may still be within limits, but it's been moved far enough of it's axis to be out of bounds */
         bool outOfBounds       = (cropperMaxX > gestureMaxX || cropperMaxY > gestureMaxY || gestureOriginX > _cropViewXOffset || gestureOriginY > _cropViewYOffset);
         
         CGFloat gestureWidth   = [recognizer view].frame.size.width;
         CGFloat gestureHeight  = [recognizer view].frame.size.height;
         
+        /* Allowing the image to be smaller than the image view's bounds prevent user interaction  */
         bool disAllowedPinch   = (gestureWidth < _cropSize.width || gestureHeight < _cropSize.height);
         
         if (outOfBounds || disAllowedPinch){
@@ -383,6 +388,7 @@ typedef enum : NSUInteger{
                                  
                              }];
         }else{
+            /* recalculate out of bounds for the next pan or pinch */
             _minimumImageXOffset = (_cropViewXOffset + _cropView.bounds.size.width)  - recognizer.view.frame.size.width;
             _minimumImageYOffset = (_cropViewYOffset + _cropView.bounds.size.height) - recognizer.view.frame.size.height;
         }

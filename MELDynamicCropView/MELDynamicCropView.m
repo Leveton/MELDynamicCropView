@@ -380,8 +380,8 @@ typedef enum : NSUInteger{
                                   delay:0.0f
                                 options:UIViewAnimationOptionCurveLinear
                              animations:^{
-                                 [[self imageToCrop] setTransform:_originalTransform];
-                                 [self setImage:_copiedImage];
+                                 [[self imageToCrop] setTransform:self.originalTransform];
+                                 [self setImage:self.copiedImage];
                                  
                              }
                              completion:^(BOOL finished) {

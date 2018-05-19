@@ -40,6 +40,8 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - setters
+
 - (void)setImage:(UIImage *)image{
     _image = image;
     [[self imageView] setImage:_image];
@@ -48,6 +50,8 @@
 - (void)setImageSize:(CGSize)imageSize{
     _imageSize = imageSize;
 }
+
+#pragma mark - getters
 
 - (UIImageView *)imageView{
     if (!_imageView){
@@ -71,6 +75,8 @@
     }
     return _button;
 }
+
+#pragma mark - selectors
 
 - (void)didTap:(id)sender{
     [self dismissViewControllerAnimated:YES completion:nil];

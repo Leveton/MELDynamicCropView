@@ -45,6 +45,17 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+#pragma mark - additions
+
+- (BOOL)deviceHasSafeArea{
+    if (@available(iOS 11, *)) {
+        if (self.window.safeAreaInsets.top){
+            return self.window.safeAreaInsets.top > 0;
+        }
+    }
+    return NO;
+}
+
 - (ViewController *)viewController{
     if (!_viewController){
         _viewController = [[ViewController alloc] init];

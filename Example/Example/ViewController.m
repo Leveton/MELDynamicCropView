@@ -8,6 +8,7 @@
 
 #import <MobileCoreServices/UTCoreTypes.h>
 
+#import "AppDelegate.h"
 #import "ViewController.h"
 #import "MELDynamicCropView.h"
 #import "ModalViewController.h"
@@ -21,6 +22,7 @@ typedef enum : NSUInteger{
 
 @interface ViewController ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
+@property (nonatomic, strong) AppDelegate             *appDelegate;
 @property (nonatomic, strong) MELDynamicCropView      *cropViewLeft;
 @property (nonatomic, strong) MELDynamicCropView      *cropViewRight;
 @property (nonatomic, strong) MELDynamicCropView      *cropViewPano;
@@ -40,10 +42,12 @@ typedef enum : NSUInteger{
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    
     
     if (!_lifted){
         _lifted = YES;
@@ -60,32 +64,35 @@ typedef enum : NSUInteger{
 - (void)viewWillLayoutSubviews{
     [super viewWillLayoutSubviews];
     
+    CGFloat notchPadding = [self.appDelegate deviceHasSafeArea] ? 20.0f : 0.0f;
+    NSLog(@"notch: %f del %@", notchPadding, self.appDelegate);
+    
     CGRect photoLeftFrame   = [[self photoRollLeft] frame];
-    photoLeftFrame.origin.y = kStatusHeight;
+    photoLeftFrame.origin.y = kStatusHeight + notchPadding;
     [[self photoRollLeft] setFrame:photoLeftFrame];
     
     CGRect photoRightFrame = [[self photoRollRight] frame];
     photoRightFrame.origin.x    = CGRectGetWidth([[self view]frame]) - photoRightFrame.size.width;
-    photoRightFrame.origin.y    = kStatusHeight;
+    photoRightFrame.origin.y    = kStatusHeight + notchPadding;
     [[self photoRollRight] setFrame:photoRightFrame];
     
     CGRect photoPanoFrame = [[self photoRollPano] frame];
     photoPanoFrame.origin.x    = (CGRectGetWidth([[self view]frame]) - photoPanoFrame.size.width)/2;
-    photoPanoFrame.origin.y    = kStatusHeight;
+    photoPanoFrame.origin.y    = kStatusHeight + notchPadding;
     [[self photoRollPano] setFrame:photoPanoFrame];
     
     CGRect leftCropFrame = [[self leftCropLabel] frame];
-    leftCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - leftCropFrame.size.height;
+    leftCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - (leftCropFrame.size.height + notchPadding);
     [[self leftCropLabel] setFrame:leftCropFrame];
     
     CGRect rightCropFrame = [[self rightCropLabel] frame];
     rightCropFrame.origin.x    = CGRectGetWidth([[self view]frame]) - rightCropFrame.size.width;
-    rightCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - rightCropFrame.size.height;
+    rightCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - (rightCropFrame.size.height + notchPadding);
     [[self rightCropLabel] setFrame:rightCropFrame];
     
     CGRect panoCropFrame = [[self panoCropLabel] frame];
     panoCropFrame.origin.x    = (CGRectGetWidth([[self view]frame]) - panoCropFrame.size.width)/2;
-    panoCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - panoCropFrame.size.height;
+    panoCropFrame.origin.y    = CGRectGetHeight([[self view] frame]) - (panoCropFrame.size.height + notchPadding);
     [[self panoCropLabel] setFrame:panoCropFrame];
     
 }
@@ -125,11 +132,12 @@ typedef enum : NSUInteger{
 }
 
 - (CGRect)cropViewPanoFrame{
+    CGFloat notchPadding = [self.appDelegate deviceHasSafeArea] ? 20.0f : 0.0f;
     CGRect frame = CGRectZero;
     frame.size.width  = CGRectGetWidth([[self view]frame])/2;
     frame.size.height = CGRectGetHeight([[self view]frame])/4;
     frame.origin.x    = (CGRectGetWidth([[self view]frame]) - frame.size.width)/2;
-    frame.origin.y    = CGRectGetHeight([[self view]frame]) - ((CGRectGetHeight([[self panoCropLabel]frame])+frame.size.height));
+    frame.origin.y    = CGRectGetHeight([[self view]frame]) - ((CGRectGetHeight([[self panoCropLabel]frame])+frame.size.height) + notchPadding);
     return frame;
 }
 
@@ -302,19 +310,19 @@ typedef enum : NSUInteger{
         UIImage *savedImage = (editedImage) ? editedImage : originalImage;
         
         if (savedImage){
-            _image = savedImage;
+            self.image = savedImage;
             
-            switch (_currentSelection) {
+            switch (self.currentSelection) {
                 case kCropLeft:
-                    [[self cropViewLeft] setImage:_image];
+                    [[self cropViewLeft] setImage:self.image];
                     [[self view] addSubview:[self cropViewLeft]];
                     break;
                 case kCropRight:
-                    [[self cropViewRight] setImage:_image];
+                    [[self cropViewRight] setImage:self.image];
                     [[self view] addSubview:[self cropViewRight]];
                     break;
                 case kCropPano:
-                    [[self cropViewPano] setImage:_image];
+                    [[self cropViewPano] setImage:self.image];
                     [[self view] addSubview:[self cropViewPano]];
                     break;
                 default:
